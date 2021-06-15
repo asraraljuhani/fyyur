@@ -36,7 +36,7 @@ class Show(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   artist_id = db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'))
   venue_id = db.Column('venue_id', db.Integer, db.ForeignKey('venue.id'))
-  start_time = db.Column('start_time', db.DateTime)
+  start_time = db.Column('start_time', db.DateTime, default=datetime.utcnow)
 
   def __repr__(self):
         return f"<Show {self.id} {self.start_time}>"
@@ -66,7 +66,7 @@ class Show(db.Model):
 class Venue(db.Model):
     __tablename__ = 'venue'
 # venue: id, name, city, state, address, phone, genres, image_link,
-# facebook_link, website, seeking_talent, seeking_description, artiest
+# facebook_link, website, seeking_talent, seeking_description
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
     city = db.Column(db.String(120))
@@ -175,7 +175,8 @@ def venues():
   # db.session.query(venue).
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-#venue: id, name, city, state, address, phone, image_link, facebook_link, artiest
+# venue: id, name, city, state, address, phone, genres, image_link,
+# facebook_link, website, seeking_talent, seeking_description
 # order by city or state, group by city or state, order by id of venue, search in show by venue id to count shows
   data=[{
     "city": "San Francisco",
@@ -316,16 +317,28 @@ def create_venue_form():
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
 # venue: id, name, city, state, address, phone, genres, image_link,
-# facebook_link, website, seeking_talent, seeking_description, artiest
+# facebook_link, website, seeking_talent, seeking_description
+  name=request.form['name']
+  city=request.form['city']
+  state=request.form['state']
+  address=request.form['address']
+  phone=request.form['phone']
+  genres=request.form['genres']
+  image_link=request.form['image_link']
+  facebook_link=request.form['facebook_link']
+  website=request.form['website']
+  seeking_talent= True if request.form.get('seeking_talent') else False
+  seeking_description=request.form['seeking_description']
 
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  venue=Venue(name=name, city=city, state=state, address=address, phone=phone,
+  genres=genres, image_link=image_link, facebook_link=facebook_link, website=website,
+  seeking_talent=seeking_talent, seeking_description=seeking_description)
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  try:
+    venue.addVenue()
+    flash('Venue ' + venue.name + ' was successfully listed!')
+  except ():
+    flash('An error occurred. Venue ' + venue.name + ' could not be listed.')
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -513,15 +526,26 @@ def create_artist_form():
 def create_artist_submission():
 # artist: id, name, city, state, phone, genres, image_link,
 # facebook_link, website, seeking_venue, seeking_description
+  name=request.form['name']
+  city=request.form['city']
+  state=request.form['state']
+  phone=request.form['phone']
+  genres=request.form['genres']
+  image_link=request.form['image_link']
+  facebook_link=request.form['facebook_link']
+  website=request.form['website']
+  seeking_venue= True if request.form.get('seeking_venue') else False
+  seeking_description=request.form['seeking_description']
 
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  artist=Artist( name=name, city=city, state=state, phone=phone, genres=genres,
+  image_link=image_link, facebook_link=facebook_link, website=website,
+  seeking_venue=seeking_venue, seeking_description=seeking_description )
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  try:
+    artist.addArtist()
+    flash('Artist ' + artist.name + ' was successfully listed!')
+  except ():
+    flash('An error occurred. Artist ' + artist.name + ' could not be listed.')
   return render_template('pages/home.html')
 
 
@@ -580,16 +604,16 @@ def create_shows():
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
   # show: artist_id, venue_id, start_time
+  artist_id=request.form['artist_id']
+  venue_id=request.form['venue_id']
+  start_time=request.form['start_time']
 
-  # called to create new shows in the db, upon submitting new show listing form
-  # TODO: insert form data as a new Show record in the db, instead
+  show =Show(artist_id,venue_id, start_time)
+
   try:
-    # on successful db insert, flash success
+    show.addShow()
     flash('Show was successfully listed!')
   except ():
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     flash('An error occurred. Show could not be listed.')
   return render_template('pages/home.html')
 
