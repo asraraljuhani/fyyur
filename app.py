@@ -38,6 +38,30 @@ class Show(db.Model):
   venue_id = db.Column('venue_id', db.Integer, db.ForeignKey('venue.id'))
   start_time = db.Column('start_time', db.DateTime)
 
+  def __repr__(self):
+        return f"<Show {self.id} {self.start_time}>"
+
+  def addShow(self):
+    try:
+      db.session.add(self)
+      db.session.commit()
+    except ():
+      db.session.rollback()
+      print(sys.exc_info())
+    finally:
+      db.session.close()
+
+  def deleteShow(self):
+      try:
+        db.session.delete(self)
+        db.session.commit()
+      except ():
+        db.session.rollback()
+        print(sys.exc_info())
+      finally:
+        db.session.close()
+
+
 
 class Venue(db.Model):
     __tablename__ = 'venue'
@@ -55,9 +79,30 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent=db.Column(db.Boolean, default=False)
     seeking_description=db.Column(db.String())
-    # artists = db.relationship('Artist', secondary=show, backref=db.backref('venue', lazy=True))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate "flask db migrate"
+    def __repr__(self):
+        return f"<Venue {self.id} {self.name}>"
+
+    def addVenue(self):
+      try:
+        db.session.add(self)
+        db.session.commit()
+      except ():
+        db.session.rollback()
+        print(sys.exc_info())
+      finally:
+        db.session.close()
+
+    def deleteVenue(self):
+      try:
+        db.session.delete(self)
+        db.session.commit()
+      except ():
+        db.session.rollback()
+        print(sys.exc_info())
+      finally:
+        db.session.close()
+
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -74,7 +119,29 @@ class Artist(db.Model):
     website = db.Column(db.String(120))
     seeking_venue=db.Column(db.Boolean, default=False)
     seeking_description=db.Column(db.String())
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate "flask db migrate"
+
+    def __repr__(self):
+        return f"<Artist {self.id} {self.name}>"
+
+    def addArtist(self):
+      try:
+        db.session.add(self)
+        db.session.commit()
+      except ():
+        db.session.rollback()
+        print(sys.exc_info())
+      finally:
+        db.session.close()
+
+    def deleteArtist(self):
+      try:
+        db.session.delete(self)
+        db.session.commit()
+      except ():
+        db.session.rollback()
+        print(sys.exc_info())
+      finally:
+        db.session.close()
 
 
 #----------------------------------------------------------------------------#
