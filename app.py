@@ -410,7 +410,7 @@ def create_artist_submission():
   city = request.form.get('city')
   state = request.form.get('state')
   phone = request.form.get('phone')
-  genres = request.form.get('genres')
+  genres = request.form.getlist('genres')
   genres=','.join([str(genre) for genre in genres])
   image_link = request.form.get('image_link')
   facebook_link = request.form.get('facebook_link')
